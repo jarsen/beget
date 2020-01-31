@@ -2,10 +2,9 @@ package cmd
 
 import (
 	"fmt"
-	"log"
 	"os"
-	"path"
 
+	"github.com/jarsen/beget/core"
 	"github.com/spf13/cobra"
 )
 
@@ -15,26 +14,12 @@ var initCmd = &cobra.Command{
 	Short: "Initialize repository",
 	Long:  `Initializes a repository in the current directory.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		projectPath, err := os.Getwd()
-		if err != nil {
-			log.Fatal(err)
-		}
-		createObjectsDir(projectPath)
-		createRefsDir(projectPath)
-		fmt.Printf("Initialized empty Jit repository in %s.", projectPath)
+		os.MkdirAll(core.ObjectsPath(), os.ModePerm)
+		os.MkdirAll(core.RefsPath(), os.ModePerm)
+		fmt.Printf("Initialized empty Jit repository in %s.", core.ProjectPath())
 	},
 }
 
 func init() {
 	rootCmd.AddCommand(initCmd)
-}
-
-func createObjectsDir(projectPath string) {
-	var refPath = path.Join(projectPath, ".git/objects")
-	os.MkdirAll(refPath, os.ModePerm)
-}
-
-func createRefsDir(projectPath string) {
-	var refPath = path.Join(projectPath, ".git/refs")
-	os.MkdirAll(refPath, os.ModePerm)
 }
