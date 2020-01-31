@@ -4,6 +4,7 @@ import (
 	"log"
 	"os"
 	"path"
+	"path/filepath"
 )
 
 func ProjectPath() string {
@@ -20,4 +21,24 @@ func ObjectsPath() string {
 
 func RefsPath() string {
 	return path.Join(ProjectPath(), ".git/refs")
+}
+
+func WorkspaceFiles() []string {
+	paths := make([]string, 0)
+	err := filepath.Walk(ProjectPath(),
+		func(path string, info os.FileInfo, err error) error {
+			if err != nil {
+				return err
+			}
+			if info.IsDir() && info.Name() == ".git" {
+				return filepath.SkipDir
+			} else if !info.IsDir() {
+				paths = append(paths, path)
+			}
+			return nil
+		})
+	if err != nil {
+		log.Println(err)
+	}
+	return paths
 }
